@@ -1,7 +1,7 @@
 # Editor SVG Interativo com Angular
 
 ## Autor  
-Seu Nome
+Josué Gomes Ribeiro
 
 ## Descrição do Projeto  
 Este projeto é um editor SVG interativo desenvolvido com Angular 19, que permite aos usuários adicionar e configurar elementos gráficos básicos, como retângulos e estrelas, diretamente em um canvas SVG. A aplicação é uma Single Page Application (SPA) modular e responsiva, com funcionalidades para manipulação visual dos elementos em tempo real.
