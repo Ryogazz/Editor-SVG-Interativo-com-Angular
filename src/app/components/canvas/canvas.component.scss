@@ -1,0 +1,37 @@
+.canvas-container {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  touch-action: none; 
+}
+
+.canvas-svg {
+  background-color: #f9f9f9;
+  
+  rect, path {
+    &.selected {
+      stroke: #0066ff;
+      stroke-width: 2px;
+    }
+    
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
+
+.grabbing-cursor {
+  cursor: grabbing !important;
+  
+  .canvas-svg rect, 
+  .canvas-svg path {
+    cursor: grabbing !important;
+  }
+}
+
+@media (hover: none) {
+  .canvas-svg rect, 
+  .canvas-svg path {
+    cursor: pointer;
+  }
+}

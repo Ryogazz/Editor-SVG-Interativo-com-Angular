@@ -1,21 +1,48 @@
-import { Component } from '@angular/core';
-import { Shape, RectangleShape, StarShape, BaseShape } from '../../shared/models/base-shape.model';
+import { Component, HostListener, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Shape, RectangleShape, StarShape } from '../../shared/models/base-shape.model';
 import { ShapeService } from '../../core/services/shape.service';
 
 @Component({
   selector: 'app-canvas',
-  imports: [],
-   standalone: true,
+  standalone: true,
   templateUrl: './canvas.component.html',
-  styleUrl: './canvas.component.scss'
+  styleUrls: ['./canvas.component.scss']
 })
-export class CanvasComponent {
-
+export class CanvasComponent implements AfterViewInit {
+  @ViewChild('canvasSvg') canvasSvg!: ElementRef<SVGSVGElement>;
+  
   shapes: Shape[] = [];
+  isDragging = false;
+  selectedShape: Shape | null = null;
+  dragOffset = { x: 0, y: 0 };
+  svgRect: DOMRect | null = null;
 
   constructor(private shapeService: ShapeService) {}
 
-    isRectangle(shape: Shape): shape is RectangleShape {
+  ngAfterViewInit(): void {
+    this.updateSvgDimensions();
+  }
+
+  private updateSvgDimensions(): void {
+    this.svgRect = this.canvasSvg.nativeElement.getBoundingClientRect();
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.updateSvgDimensions();
+  }
+
+  ngOnInit(): void {
+    this.shapeService.shapes$.subscribe(shapes => {
+      this.shapes = shapes;
+    });
+
+    this.shapeService.selectedShape$.subscribe(shape => {
+      this.selectedShape = shape;
+    });
+  }
+
+  isRectangle(shape: Shape): shape is RectangleShape {
     return shape.type === 'rectangle';
   }
 
@@ -23,14 +50,85 @@ export class CanvasComponent {
     return shape.type === 'star';
   }
 
-  ngOnInit(): void {
-this.shapeService.shapes$.subscribe(shapes => {
-      this.shapes = shapes;
-    });
+  startDrag(shape: Shape, event: MouseEvent | TouchEvent): void {
+    event.preventDefault();
+    this.isDragging = true;
+    
+    this.updateSvgDimensions();
+    
+    if (shape !== this.selectedShape) {
+      this.shapeService.selectShape(shape);
+    }
+    
+    const clientX = this.getClientX(event);
+    const clientY = this.getClientY(event);
+    
+    this.dragOffset = {
+      x: clientX - shape.x,
+      y: clientY - shape.y
+    };
+
+    document.body.classList.add('grabbing-cursor');
   }
 
-  onShapeClick(shape: Shape) {
-    this.shapeService.selectShape(shape);
+  @HostListener('document:mousemove', ['$event'])
+  @HostListener('document:touchmove', ['$event'])
+  onMove(event: MouseEvent | TouchEvent): void {
+    if (!this.isDragging || !this.selectedShape || !this.svgRect) return;
+
+    const clientX = this.getClientX(event);
+    const clientY = this.getClientY(event);
+    
+    let newX = clientX - this.dragOffset.x;
+    let newY = clientY - this.dragOffset.y;
+
+    if (this.isRectangle(this.selectedShape)) {
+      newX = Math.max(0, Math.min(newX, this.svgRect.width - this.selectedShape.width));
+      newY = Math.max(0, Math.min(newY, this.svgRect.height - this.selectedShape.height));
+    }
+    else if (this.isStar(this.selectedShape)) {
+      const padding = this.selectedShape.outerRadius * 2;
+      newX = Math.max(padding - this.selectedShape.outerRadius, 
+                     Math.min(newX, this.svgRect.width - this.selectedShape.outerRadius));
+      newY = Math.max(padding - this.selectedShape.outerRadius, 
+                     Math.min(newY, this.svgRect.height - this.selectedShape.outerRadius));
+    }
+
+    const updatedShape = {
+      ...this.selectedShape,
+      x: newX,
+      y: newY
+    };
+
+    this.shapeService.updateShape(updatedShape);
+  }
+
+  @HostListener('document:mouseup')
+  @HostListener('document:touchend')
+  stopDrag(): void {
+    if (this.isDragging) {
+      this.isDragging = false;
+      document.body.classList.remove('grabbing-cursor');
+    }
+  }
+
+  private getClientX(event: MouseEvent | TouchEvent): number {
+    return event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+  }
+
+  private getClientY(event: MouseEvent | TouchEvent): number {
+    return event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+  }
+
+  onShapeClick(shape: Shape, event: MouseEvent | TouchEvent): void {
+    if (!this.isDragging) {
+      this.shapeService.selectShape(shape);
+      event.stopPropagation();
+    }
+  }
+
+  clearSelection(): void {
+    this.shapeService.selectShape(null);
   }
 
   generateStarPath(cx: number, cy: number, outerR: number, innerR: number, numPoints: number): string {
@@ -46,9 +144,4 @@ this.shapeService.shapes$.subscribe(shapes => {
 
     return path + ' Z';
   }
-
-    clearSelection() {
-    this.shapeService.selectShape(null);
-  }
-
 }
