@@ -1,16 +1,46 @@
-@if (selectedRect) {
-  <div class="panel">
-    <h3>Retângulo Selecionado</h3>
-    <label>
-      Arredondamento dos Cantos:
-      <input
-        type="range"
-        min="0"
-        max="100"
-        [value]="selectedRect.rx ?? 0"
-        (input)="onRxChange(getInputValue($event))"
-      />
-      <span>{{ selectedRect.rx ?? 0 }}</span>
-    </label>
-  </div>
-}
+<div class="panel">
+  @if (selectedRect) {
+    <div class="shape-properties">
+      <h3>Retângulo</h3>
+      <div class="control-group">
+        <label>
+          Arredondamento:
+          <input type="range" min="0" max="100"
+                 [value]="selectedRect.rx ?? 0"
+                 (input)="updateRectangle({ rx: getInputValue($event) })">
+          {{ selectedRect.rx ?? 0 }}
+        </label>
+      </div>
+    </div>
+  }
+
+  @if (selectedStar) {
+    <div class="shape-properties">
+      <h3>Estrela</h3>
+      <div class="control-group">
+        <label>
+          Pontas:
+          <input type="range" min="3" max="12" step="1"
+                 [value]="selectedStar.points"
+                 (input)="updateStar({ points: getInputValue($event) })">
+          {{ selectedStar.points }}
+        </label>
+      </div>
+      <div class="control-group">
+        <label>
+          Raio Interno:
+          <input type="range" min="5" max="50" step="1"
+                 [value]="selectedStar.innerRadius"
+                 (input)="updateStar({ innerRadius: getInputValue($event) })">
+          {{ selectedStar.innerRadius }}
+        </label>
+      </div>
+    </div>
+  }
+
+  @if (!selectedRect && !selectedStar) {
+    <div class="empty-state">
+      Selecione uma forma para editar suas propriedades
+    </div>
+  }
+</div>

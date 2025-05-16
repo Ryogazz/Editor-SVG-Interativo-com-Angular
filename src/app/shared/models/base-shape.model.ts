@@ -13,7 +13,7 @@ export interface RectangleShape extends BaseShape {
   type: 'rectangle';
   width: number;
   height: number;
-  rx?: number; // radius opcional
+  rx?: number; 
 }
 
 export interface StarShape extends BaseShape {

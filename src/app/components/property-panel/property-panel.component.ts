@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RectangleShape } from '../../shared/models/base-shape.model';
+import { RectangleShape, StarShape } from '../../shared/models/base-shape.model';
 import { Subscription } from 'rxjs';
 import { ShapeService } from '../../core/services/shape.service';
 
@@ -10,6 +10,7 @@ import { ShapeService } from '../../core/services/shape.service';
 })
 export class PropertyPanelComponent {
   selectedRect: RectangleShape | null = null;
+  selectedStar: StarShape | null = null;
   private sub: Subscription | null = null;
 
  constructor(private shapeService: ShapeService) {}
@@ -17,24 +18,31 @@ export class PropertyPanelComponent {
   ngOnInit(): void {
     this.sub = this.shapeService.selectedShape$.subscribe(shape => {
       this.selectedRect = shape?.type === 'rectangle' ? shape as RectangleShape : null;
+      this.selectedStar = shape?.type === 'star' ? shape as StarShape : null;
     });
   }
 
-  onRxChange(value: number) {
+    updateRectangle(update: Partial<RectangleShape>): void {
     if (!this.selectedRect) return;
-    const updated: RectangleShape = {
-      ...this.selectedRect,
-      rx: value
-    };
+    const updated = { ...this.selectedRect, ...update };
     this.shapeService.updateShape(updated);
-    this.shapeService.selectShape(updated); 
+    this.shapeService.selectShape(updated);
   }
+
+    updateStar(update: Partial<StarShape>): void {
+    if (!this.selectedStar) return;
+    const updated = { ...this.selectedStar, ...update };
+    this.shapeService.updateShape(updated);
+    this.shapeService.selectShape(updated);
+  }
+
+     getInputValue(event: Event): number {
+  return (event.target as HTMLInputElement).valueAsNumber;
+}
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
   }
 
-  getInputValue(event: Event): number {
-  return (event.target as HTMLInputElement).valueAsNumber;
-}
+
 }
