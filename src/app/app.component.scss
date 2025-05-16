@@ -1,0 +1,12 @@
+.main-layout {
+  display: flex;
+  height: calc(100vh - 60px); 
+  .canvas-area {
+    flex: 1;
+    border-right: 1px solid #ddd;
+  }
+
+  .panel-area {
+    width: 260px;
+  }
+}
