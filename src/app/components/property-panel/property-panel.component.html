@@ -7,7 +7,7 @@
           Arredondamento:
           <input type="range" min="0" max="100"
                  [value]="selectedRect.rx ?? 0"
-                 (input)="updateRectangle({ rx: getInputValue($event) })">
+                 (input)="updateRectangle({rx: getInputValue($event, true)  })">
           {{ selectedRect.rx ?? 0 }}
         </label>
       </div>
@@ -22,7 +22,7 @@
           Pontas:
           <input type="range" min="3" max="12" step="1"
                  [value]="selectedStar.points"
-                 (input)="updateStar({ points: getInputValue($event) })">
+                 (input)="updateStar({ points: getInputValue($event, true) })">
           {{ selectedStar.points }}
         </label>
       </div>
@@ -31,7 +31,7 @@
           Raio Interno:
           <input type="range" min="5" max="50" step="1"
                  [value]="selectedStar.innerRadius"
-                 (input)="updateStar({ innerRadius: getInputValue($event) })">
+                 (input)="updateStar({ innerRadius: getInputValue($event, true) })">
           {{ selectedStar.innerRadius }}
         </label>
       </div>
@@ -43,4 +43,40 @@
       Selecione uma forma para editar suas propriedades
     </div>
   }
+
+  
+@if (selectedRect || selectedStar) {
+  <div class="visual-controls">
+    <label>
+      Cor de Preenchimento:
+      <input
+        type="color"
+        [value]="(selectedRect || selectedStar)!.fill"
+        (input)="updateVisualProp('fill', getInputValue($event))"
+      />
+    </label>
+
+    <label>
+      Cor da Borda:
+      <input
+        type="color"
+        [value]="(selectedRect || selectedStar)!.stroke"
+        (input)="updateVisualProp('stroke', getInputValue($event))"
+      />
+    </label>
+
+    <label>
+      Espessura da Borda:
+      <input
+        type="range"
+        min="0"
+        max="10"
+        [value]="(selectedRect || selectedStar)!.strokeWidth"
+        (input)="updateVisualProp('strokeWidth', getInputValue($event, true))"
+      />
+      <span>{{ (selectedRect || selectedStar)!.strokeWidth }}</span>
+    </label>
+  </div>
+}
+
 </div>

@@ -36,9 +36,25 @@ export class PropertyPanelComponent {
     this.shapeService.selectShape(updated);
   }
 
-     getInputValue(event: Event): number {
-  return (event.target as HTMLInputElement).valueAsNumber;
+getInputValue(event: Event): string;
+getInputValue(event: Event, asNumber: true): number;
+getInputValue(event: Event, asNumber = false): string | number {
+  const target = event.target as HTMLInputElement;
+  return asNumber ? target.valueAsNumber : target.value;
 }
+
+
+updateVisualProp(prop: 'fill' | 'stroke', value: string): void;
+updateVisualProp(prop: 'strokeWidth', value: number): void;
+updateVisualProp(prop: 'fill' | 'stroke' | 'strokeWidth', value: string | number): void {
+  const current = this.selectedRect ?? this.selectedStar;
+  if (!current) return;
+
+  const updated = { ...current, [prop]: value };
+  this.shapeService.updateShape(updated);
+  this.shapeService.selectShape(updated);
+}
+
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
