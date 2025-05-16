@@ -6,13 +6,17 @@ export interface BaseShape {
   fill: string;
   stroke: string;
   strokeWidth: number;
+  minWidth?: number;
+  minHeight?: number;
 }
 
 export interface RectangleShape extends BaseShape {
   type: 'rectangle';
   width: number;
   height: number;
-  rx?: number; 
+  rx?: number;
+  minWidth?: number;
+  minHeight?: number;
 }
 
 export interface StarShape extends BaseShape {
@@ -20,6 +24,8 @@ export interface StarShape extends BaseShape {
   outerRadius: number;
   innerRadius: number;
   points: number;
+  minWidth?: number;
+  minHeight?: number;
 }
 
 export type Shape = RectangleShape | StarShape;

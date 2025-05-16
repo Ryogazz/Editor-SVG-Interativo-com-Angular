@@ -17,6 +17,12 @@ export class CanvasComponent implements AfterViewInit {
   dragOffset = { x: 0, y: 0 };
   svgRect: DOMRect | null = null;
 
+    isResizing = false;
+  activeHandle: string | null = null;
+  startDimensions: { width: number; height: number; x: number; y: number } = { width: 0, height: 0, x: 0, y: 0 };
+  startMousePos = { x: 0, y: 0 };
+  maintainAspectRatio = false;
+
   constructor(private shapeService: ShapeService) {}
 
   ngAfterViewInit(): void {
@@ -144,4 +150,146 @@ export class CanvasComponent implements AfterViewInit {
 
     return path + ' Z';
   }
+
+   getRectangleHandles(shape: RectangleShape) {
+    const handles = [
+      { position: 'nw', x: shape.x, y: shape.y },
+      { position: 'ne', x: shape.x + shape.width, y: shape.y },
+      { position: 'sw', x: shape.x, y: shape.y + shape.height },
+      { position: 'se', x: shape.x + shape.width, y: shape.y + shape.height }
+    ];
+    return handles;
+  }
+
+  getStarHandles(shape: StarShape) {
+    const handles = [
+      { position: 'nw', x: shape.x - shape.outerRadius, y: shape.y - shape.outerRadius },
+      { position: 'se', x: shape.x + shape.outerRadius, y: shape.y + shape.outerRadius }
+    ];
+    return handles;
+  }
+
+  startResize(shape: Shape, handlePosition: string, event: MouseEvent | TouchEvent) {
+    event.stopPropagation();
+    this.isResizing = true;
+    this.activeHandle = handlePosition;
+    this.maintainAspectRatio = event.shiftKey; 
+
+  
+    const clientX = this.getClientX(event);
+    const clientY = this.getClientY(event);
+    this.startMousePos = { x: clientX, y: clientY };
+
+    
+    if (this.isRectangle(shape)) {
+      this.startDimensions = {
+        width: shape.width,
+        height: shape.height,
+        x: shape.x,
+        y: shape.y
+      };
+    } else if (this.isStar(shape)) {
+      this.startDimensions = {
+        width: shape.outerRadius * 2,
+        height: shape.outerRadius * 2,
+        x: shape.x,
+        y: shape.y
+      };
+    }
+  }
+
+  handleResize(event: MouseEvent | TouchEvent) {
+    if (!this.isResizing || !this.selectedShape || !this.svgRect) return;
+
+    const clientX = this.getClientX(event);
+    const clientY = this.getClientY(event);
+    const deltaX = clientX - this.startMousePos.x;
+    const deltaY = clientY - this.startMousePos.y;
+
+    if (this.isRectangle(this.selectedShape)) {
+      this.resizeRectangle(deltaX, deltaY);
+    } else if (this.isStar(this.selectedShape)) {
+      this.resizeStar(deltaX, deltaY);
+    }
+  }
+
+  private resizeRectangle(deltaX: number, deltaY: number) {
+    const shape = this.selectedShape as RectangleShape;
+    const minWidth = shape.minWidth || 20;
+    const minHeight = shape.minHeight || 20;
+    
+    let { width, height, x, y } = this.startDimensions;
+
+    switch (this.activeHandle) {
+      case 'nw':
+        width = Math.max(minWidth, width - deltaX);
+        height = this.maintainAspectRatio ? width * (this.startDimensions.height / this.startDimensions.width) : 
+                 Math.max(minHeight, height - deltaY);
+        x = this.startDimensions.x + (this.startDimensions.width - width);
+        y = this.startDimensions.y + (this.startDimensions.height - height);
+        break;
+      case 'ne':
+        width = Math.max(minWidth, width + deltaX);
+        height = this.maintainAspectRatio ? width * (this.startDimensions.height / this.startDimensions.width) : 
+                 Math.max(minHeight, height - deltaY);
+        y = this.startDimensions.y + (this.startDimensions.height - height);
+        break;
+      case 'sw':
+        width = Math.max(minWidth, width - deltaX);
+        height = this.maintainAspectRatio ? width * (this.startDimensions.height / this.startDimensions.width) : 
+                 Math.max(minHeight, height + deltaY);
+        x = this.startDimensions.x + (this.startDimensions.width - width);
+        break;
+      case 'se':
+        width = Math.max(minWidth, width + deltaX);
+        height = this.maintainAspectRatio ? width * (this.startDimensions.height / this.startDimensions.width) : 
+                 Math.max(minHeight, height + deltaY);
+        break;
+    }
+
+
+    const updatedShape: RectangleShape = {
+      ...shape,
+      x,
+      y,
+      width,
+      height
+    };
+
+    this.shapeService.updateShape(updatedShape);
+  }
+
+  private resizeStar(deltaX: number, deltaY: number) {
+    const shape = this.selectedShape as StarShape;
+    const minSize = shape.minWidth || shape.outerRadius * 0.5;
+    
+    let newOuterRadius = this.startDimensions.width / 2;
+
+    switch (this.activeHandle) {
+      case 'nw':
+        newOuterRadius = Math.max(minSize, (this.startDimensions.width - deltaX - deltaY) / 2);
+        break;
+      case 'se':
+        newOuterRadius = Math.max(minSize, (this.startDimensions.width + deltaX + deltaY) / 2);
+        break;
+    }
+
+
+    const ratio = shape.innerRadius / shape.outerRadius;
+    const newInnerRadius = newOuterRadius * ratio;
+
+    const updatedShape: StarShape = {
+      ...shape,
+      outerRadius: newOuterRadius,
+      innerRadius: newInnerRadius
+    };
+
+    this.shapeService.updateShape(updatedShape);
+  }
+
+  endResize() {
+    this.isResizing = false;
+    this.activeHandle = null;
+  }
+
 }

@@ -1,5 +1,10 @@
 <div class="canvas-container">
-  <svg #canvasSvg width="100%" height="600" class="canvas-svg" (click)="clearSelection()">
+  <svg #canvasSvg width="100%" height="600" class="canvas-svg" (click)="clearSelection()"
+       (mousemove)="isDragging ? onMove($event) : isResizing ? handleResize($event) : null"
+       (touchmove)="isDragging ? onMove($event) : isResizing ? handleResize($event) : null"
+       (mouseup)="stopDrag(); endResize()"
+       (touchend)="stopDrag(); endResize()">
+    
     @for (shape of shapes; track shape.id) {
       @if (isRectangle(shape)) {
         <rect [attr.x]="shape.x"
@@ -28,6 +33,41 @@
               (click)="onShapeClick(shape, $event)"
               style="cursor: grab;">
         </path>
+      }
+      
+      @if (selectedShape?.id === shape.id) {
+        @if (isRectangle(shape)) {
+          @for (handle of getRectangleHandles(shape); track handle.position) {
+            <circle [attr.cx]="handle.x" 
+                   [attr.cy]="handle.y"
+                   r="6"
+                   fill="white"
+                   stroke="#0066ff"
+                   stroke-width="2"
+                   (mousedown)="startResize(shape, handle.position, $event)"
+                   (touchstart)="startResize(shape, handle.position, $event)"
+                   style="cursor: nwse-resize;"
+                   class="resize-handle"
+                   [class.active-handle]="activeHandle === handle.position">
+            </circle>
+          }
+        }
+        @if (isStar(shape)) {
+          @for (handle of getStarHandles(shape); track handle.position) {
+            <circle [attr.cx]="handle.x" 
+                   [attr.cy]="handle.y"
+                   r="6"
+                   fill="white"
+                   stroke="#0066ff"
+                   stroke-width="2"
+                   (mousedown)="startResize(shape, handle.position, $event)"
+                   (touchstart)="startResize(shape, handle.position, $event)"
+                   style="cursor: nwse-resize;"
+                   class="resize-handle" 
+                   [class.active-handle]="activeHandle === handle.position">  
+            </circle>
+          }
+        }
       }
     }
   </svg>
