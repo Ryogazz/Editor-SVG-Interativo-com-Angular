@@ -1,1 +1,28 @@
-<p>canvas works!</p>
+<div class="canvas-container">
+  <svg width="100%" height="600" class="canvas-svg">
+    @for (shape of shapes; track shape.id) {
+      @if (isRectangle(shape)) {
+        <rect [attr.x]="shape.x"
+              [attr.y]="shape.y"
+              [attr.width]="shape.width"
+              [attr.height]="shape.height"
+              [attr.rx]="shape.rx"
+              [attr.fill]="shape.fill"
+              [attr.stroke]="shape.stroke"
+              [attr.stroke-width]="shape.strokeWidth"
+              (click)="onShapeClick(shape)"
+              style="cursor: pointer;">
+        </rect>
+      }
+      @if (isStar(shape)) {
+        <path [attr.d]="generateStarPath(shape.x, shape.y, shape.outerRadius, shape.innerRadius, shape.points)"
+              [attr.fill]="shape.fill"
+              [attr.stroke]="shape.stroke"
+              [attr.stroke-width]="shape.strokeWidth"
+              (click)="onShapeClick(shape)"
+              style="cursor: pointer;">
+        </path>
+      }
+    }
+  </svg>
+</div>
