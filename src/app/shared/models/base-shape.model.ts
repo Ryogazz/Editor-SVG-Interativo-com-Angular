@@ -29,3 +29,11 @@ export interface StarShape extends BaseShape {
 }
 
 export type Shape = RectangleShape | StarShape;
+
+export function isRectangle(shape: Shape): shape is RectangleShape {
+  return shape.type === 'rectangle';
+}
+
+export function isStar(shape: Shape): shape is StarShape {
+  return shape.type === 'star';
+}

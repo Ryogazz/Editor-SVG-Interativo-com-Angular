@@ -35,4 +35,10 @@ export class ToolbarComponent {
       strokeWidth: 2
     });
   }
+
+clearCanvas(): void {
+  if (confirm('Tem certeza que deseja limpar o canvas?')) {
+    this.shapeService.clearAll();
+  }
+}
 }
