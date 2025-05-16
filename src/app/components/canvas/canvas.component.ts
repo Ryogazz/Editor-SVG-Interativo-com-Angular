@@ -48,4 +48,8 @@ this.shapeService.shapes$.subscribe(shapes => {
     return path + ' Z';
   }
 
+    clearSelection() {
+    this.shapeService.selectShape(null);
+  }
+
 }

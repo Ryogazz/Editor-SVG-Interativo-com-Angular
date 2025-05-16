@@ -1,5 +1,5 @@
 <div class="canvas-container">
-  <svg width="100%" height="600" class="canvas-svg">
+  <svg width="100%" height="600" class="canvas-svg" (click)="clearSelection()">
     @for (shape of shapes; track shape.id) {
       @if (isRectangle(shape)) {
         <rect [attr.x]="shape.x"
@@ -10,7 +10,7 @@
               [attr.fill]="shape.fill"
               [attr.stroke]="shape.stroke"
               [attr.stroke-width]="shape.strokeWidth"
-              (click)="onShapeClick(shape)"
+              (click)="onShapeClick(shape); $event.stopPropagation()"
               style="cursor: pointer;">
         </rect>
       }
@@ -19,7 +19,7 @@
               [attr.fill]="shape.fill"
               [attr.stroke]="shape.stroke"
               [attr.stroke-width]="shape.strokeWidth"
-              (click)="onShapeClick(shape)"
+              (click)="onShapeClick(shape); $event.stopPropagation()"
               style="cursor: pointer;">
         </path>
       }
