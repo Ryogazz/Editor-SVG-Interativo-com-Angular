@@ -1,0 +1,22 @@
+.panel {
+  padding: 12px;
+  background: #f9f9f9;
+  border-left: 1px solid #ccc;
+  width: 240px;
+  height: 100%;
+  box-sizing: border-box;
+
+  h3 {
+    margin-top: 0;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  input[type="range"] {
+    width: 100%;
+  }
+}

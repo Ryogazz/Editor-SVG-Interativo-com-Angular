@@ -1,1 +1,16 @@
-<p>property-panel works!</p>
+@if (selectedRect) {
+  <div class="panel">
+    <h3>Retângulo Selecionado</h3>
+    <label>
+      Arredondamento dos Cantos:
+      <input
+        type="range"
+        min="0"
+        max="100"
+        [value]="selectedRect.rx ?? 0"
+        (input)="onRxChange(getInputValue($event))"
+      />
+      <span>{{ selectedRect.rx ?? 0 }}</span>
+    </label>
+  </div>
+}
