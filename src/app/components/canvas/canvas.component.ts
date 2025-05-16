@@ -19,7 +19,6 @@ export class CanvasComponent {
     return shape.type === 'rectangle';
   }
 
-  // Type guard para Star
   isStar(shape: Shape): shape is StarShape {
     return shape.type === 'star';
   }

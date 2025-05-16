@@ -53,4 +53,13 @@ export class ShapeService {
   private generateId(): string {
     return Math.random().toString(36).substring(2, 9);
   }
+
+
+removeShape(shapeId: string): void {
+  const updatedShapes = this.shapesSubject.value.filter(shape => shape.id !== shapeId);
+  this.shapesSubject.next(updatedShapes);
+  this.selectedShapeSubject.next(null); 
+}
+
+
 }

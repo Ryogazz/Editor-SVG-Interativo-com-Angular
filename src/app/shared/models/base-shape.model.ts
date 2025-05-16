@@ -1,4 +1,3 @@
-// base-shape.model.ts
 export interface BaseShape {
   id: string;
   type: string;

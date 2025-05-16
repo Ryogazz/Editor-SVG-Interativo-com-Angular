@@ -55,6 +55,14 @@ updateVisualProp(prop: 'fill' | 'stroke' | 'strokeWidth', value: string | number
   this.shapeService.selectShape(updated);
 }
 
+removeSelectedShape(): void {
+  const shapeToRemove = this.selectedRect || this.selectedStar;
+  if (!shapeToRemove) return;
+
+  this.shapeService.removeShape(shapeToRemove.id);
+  this.selectedRect = null;
+  this.selectedStar = null;
+}
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
