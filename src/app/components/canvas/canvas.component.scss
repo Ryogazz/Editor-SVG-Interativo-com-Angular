@@ -9,13 +9,12 @@
   background-color: #f9f9f9;
   
   rect, path {
-    &.selected {
-      stroke: #0066ff;
-      stroke-width: 2px;
-    }
+
     
     &:hover {
       opacity: 0.9;
+      stroke: #0066ff;
+      stroke-width: 2px;
     }
   }
 }
