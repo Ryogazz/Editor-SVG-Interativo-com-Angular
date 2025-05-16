@@ -1,12 +1,29 @@
 .main-layout {
   display: flex;
-  height: calc(100vh - 60px); 
+  flex-direction: column; 
+  height: calc(100vh - 60px);
+
   .canvas-area {
     flex: 1;
-    border-right: 1px solid #ddd;
+    border-right: none; 
+     padding-bottom: 80px
   }
 
   .panel-area {
-    width: 260px;
+    width: 100%; 
+    border-top: 1px solid #ccc; 
+  }
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+
+    .canvas-area {
+      border-right: 1px solid #ddd;
+    }
+
+    .panel-area {
+      width: 260px;
+      border-top: none;
+    }
   }
 }
