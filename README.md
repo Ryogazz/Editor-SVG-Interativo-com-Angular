@@ -52,10 +52,10 @@ Optei por CSS puro sem bibliotecas externas (Bootstrap, Material), para manter c
 
 ```bash
 # Clone o repositório
-git clone <URL_DO_REPOSITORIO>
+git clone git@github.com:Ryogazz/Editor-SVG-Interativo-com-Angular.git
 
 # Entre na pasta do projeto
-cd nome-do-projeto
+cd Editor-SVG-Interativo-com-Angular
 
 # Instale as dependências
 npm install
